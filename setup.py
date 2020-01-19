@@ -1,10 +1,9 @@
 from setuptools import setup
 setup(name='bravepackage',
 version='0.1',
-description='Testing installation of Package',
+description='Brave University of Package',
 url='#',
-author='malhar',
-author_email='mlathkar@gmail.com',
+author='HoanDo',
 license='MIT',
 packages=['constants','config','api','controllers','models'],
 zip_safe=False)
