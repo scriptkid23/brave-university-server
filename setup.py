@@ -5,5 +5,5 @@ description='Brave University of Package',
 url='#',
 author='HoanDo',
 license='MIT',
-packages=['constants','config','api','controllers','models'],
+packages=['constants','config','api','controllers','models','utils'],
 zip_safe=False)
