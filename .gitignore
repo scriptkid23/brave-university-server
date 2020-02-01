@@ -1,2 +1,6 @@
 venv
 *.pyc
+bravepackage.egg-info
+build
+dist
+
