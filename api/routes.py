@@ -1,6 +1,7 @@
 from controllers.employeeController import EmployeesController,EmployeeController
 from controllers.homeController import HomeController
 from controllers.authController import *
+from controllers.roleController import *
 def initialize_routes(api):
     # --------- HomeController --------
 
@@ -13,3 +14,7 @@ def initialize_routes(api):
 
     api.add_resource(EmployeesController,'/api/employees')
     api.add_resource(EmployeeController,'/api/employee')
+
+    # Create Role 
+
+    api.add_resource(RoleController,'/api/role')

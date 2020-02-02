@@ -26,7 +26,7 @@ class Member(db.Document):
         }
         return json.dumps(member_dict)
     
-    def check_password(self,password):
+    def checkPassword(self,password):
         if(self.member_password == password):
             return True
         else:
@@ -44,7 +44,7 @@ def register(payload):
 
 def login(payload):
     member = Member.objects.get(member_username = payload["member_username"])
-    authorized = member.check_password(payload["member_password"])
+    authorized = member.checkPassword(payload["member_password"])
     if not authorized:
         return False
     expires = datetime.timedelta(days = 1)

@@ -24,7 +24,6 @@ class MemberRegisterController(Resource):
                 mimetype="application/json", 
                 status=errors['MemberAlreadyExistsError']['status'])
         except(ValidationError):
-            print(ValidationError)
             return Response(
                 json.dumps(errors['ValidationError']),
                 mimetype="application/json",

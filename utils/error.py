@@ -53,5 +53,11 @@ errors = {
      "UnauthorizedError": {
          "message": "Invalid username or password",
          "status": 401
-     }
+     },
+
+    #  Role 
+    "DuplicateRole" : {
+        "message" : "Role with given name already exists",
+        "status" : 400
+    }
 }
