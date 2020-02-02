@@ -3,23 +3,55 @@ from models.memberModel import *
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required,get_raw_jwt
 import json
+from mongoengine.errors import FieldDoesNotExist, NotUniqueError, DoesNotExist, ValidationError, InvalidQueryError,NotUniqueError
+
+from utils.error import errors
+
+
+
 class MemberRegisterController(Resource):
     def post(self):
-        payload = request.get_json()
-        result = register(payload)
-        if result:
-            return Response(json.dumps({"code" : 400,"status" :"Create member failed"}), mimetype="application/json", status=400)
-        else:
+        try:
+            payload = request.get_json()
+            result = register(payload)
+        # if result:
+        #     return Response(json.dumps({"code" : 400,"status" :"Create member failed"}), mimetype="application/json", status=400)
+        # else:
             return Response(json.dumps({"code" : 200,"status" :"Create member sucesss"}), mimetype="application/json", status=200)
+        except(NotUniqueError):
+            return Response(
+                json.dumps(errors['MemberAlreadyExistsError']), 
+                mimetype="application/json", 
+                status=errors['MemberAlreadyExistsError']['status'])
+        except(ValidationError):
+            print(ValidationError)
+            return Response(
+                json.dumps(errors['ValidationError']),
+                mimetype="application/json",
+                status=errors['ValidationError']['status']
+            )
+
 class MemberLoginController(Resource):
     def post(self):
-        payload = request.get_json()
-        result = login(payload)
-        # print(result)
-        if(result):
-            return Response(json.dumps({"code" : 200,"token" : result}), mimetype="application/json",status=200)
-        else:
-            return Response(json.dumps({"code" : 400,"status" :"Login member failed"}), mimetype="application/json",status=400)
+        try: 
+            payload = request.get_json()
+            result = login(payload)
+     
+            if result:
+                return Response(json.dumps({"code" : 200,"token" : result}), mimetype="application/json",status=200,headers={"token":result})
+            else:
+                return Response(
+                    json.dumps(errors['UnauthorizedError']),
+                    mimetype="application/json",
+                    status=errors['UnauthorizedError']['status']
+                )
+        except(DoesNotExist):
+            return Response(
+                json.dumps(errors['MemberNotExistsError']),
+                mimetype="application/json",
+                status=errors['MemberNotExistsError']['status']
+            )
+        
 class MemberLogoutController(Resource):
     @jwt_required
     def delete(self):

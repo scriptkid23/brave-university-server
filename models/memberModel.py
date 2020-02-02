@@ -5,11 +5,18 @@ from utils.createID import encodedID
 from utils.blacklist import * 
 import json 
 
+# from mongoengine.errors import FieldDoesNotExist, NotUniqueError, DoesNotExist, ValidationError, InvalidQueryError,NotUniqueError
+
+# # Initialize Validation 
+# def checkFieldUsername(self):
+#         if(len(self.member_username) == 0):
+#             raise ValidationError('Username Field not null ')
+
 class Member(db.Document):
 
     member_id = db.StringField(required=True, unique=True)
-    member_username = db.StringField(max_length=255, required=True,unique=True)
-    member_password = db.StringField(max_length=255, required=True)
+    member_username = db.StringField(max_length=255, min_length = 1,  required=True,unique=True)
+    member_password = db.StringField(max_length=255, min_length = 6,  required=True)
 
     def json(self):
         member_dict = {
@@ -18,6 +25,7 @@ class Member(db.Document):
            "member_password": self.member_password
         }
         return json.dumps(member_dict)
+    
     def check_password(self,password):
         if(self.member_password == password):
             return True
@@ -25,17 +33,14 @@ class Member(db.Document):
             return False
     
 
+
 def register(payload):
-    try:
         newMember= Member(
-        member_id=encodedID(payload['member_username']),
-        member_username=payload["member_username"],
-        member_password=payload["member_password"],
+        member_id      = encodedID(payload['member_username']),
+        member_username= payload["member_username"],
+        member_password= payload["member_password"],
         )
-        newMember.save()
-        return False
-    except:
-        return True
+        newMember.save(validate=True)
 
 def login(payload):
     member = Member.objects.get(member_username = payload["member_username"])
