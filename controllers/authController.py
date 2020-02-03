@@ -3,7 +3,7 @@ from models.memberModel import *
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required,get_raw_jwt
 import json
-from mongoengine.errors import FieldDoesNotExist, NotUniqueError, DoesNotExist, ValidationError, InvalidQueryError,NotUniqueError
+from mongoengine.errors import *
 
 from utils.error import errors
 
@@ -17,7 +17,10 @@ class MemberRegisterController(Resource):
         # if result:
         #     return Response(json.dumps({"code" : 400,"status" :"Create member failed"}), mimetype="application/json", status=400)
         # else:
-            return Response(json.dumps({"code" : 200,"status" :"Create member sucesss"}), mimetype="application/json", status=200)
+            return Response(
+                json.dumps({"code" : 200,"status" :"Create member sucesss"}), 
+                mimetype="application/json", 
+                status=200)
         except(NotUniqueError):
             return Response(
                 json.dumps(errors['MemberAlreadyExistsError']), 
@@ -37,7 +40,10 @@ class MemberLoginController(Resource):
             result = login(payload)
      
             if result:
-                return Response(json.dumps({"code" : 200,"token" : result}), mimetype="application/json",status=200,headers={"token":result})
+                return Response(json.dumps({"code" : 200,"payload" : result}), 
+                mimetype="application/json",
+                status=200,
+                headers={"token":result['access_token']})
             else:
                 return Response(
                     json.dumps(errors['UnauthorizedError']),
@@ -55,7 +61,10 @@ class MemberLogoutController(Resource):
     @jwt_required
     def delete(self):
         logout()
-        return Response(json.dumps({"code" :200,"status" :"logout success"}), mimetype="application/json",status=200)
+        return Response(
+            json.dumps({"code" :200,"status" :"logout success"}), 
+            mimetype="application/json",
+            status=200)
 
 
 # class EmployeeController(Resource):
