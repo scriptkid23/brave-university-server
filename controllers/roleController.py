@@ -17,19 +17,12 @@ class RolesController(Resource):
 
       
 class RoleController(Resource):
-    # Tạo 1 nhân viên 
-    @jwt_required
+    # @jwt_required
     def post(self):
-        try:
-            payload = request.get_json()
-            createRole(payload)
-            return Response(json.dumps({"code" : 200,"status" :"insert role sucesss"}),mimetype="application/json",status=200)
-        except(DuplicateKeyError):
-            return Response(
-                json.dumps(errors['DuplicateRole']),
-                mimetype='application/json',
-                status = 400
-            )
+        payload = request.get_json()
+        createRole(payload)
+        return Response(json.dumps({"code" : 200,"status" :"insert role sucesss"}),mimetype="application/json",status=200)
+       
     # cập nhật thông tin của một nhân viên 
     # @jwt_required
     # def put(self):
