@@ -6,7 +6,7 @@ from utils.blacklist import *
 import json 
 from bson.objectid import ObjectId
 from bson.json_util import loads,dumps
-from utils.constant import * 
+# from utils.constant import * 
 
 from models.roleModel import *
 # from mongoengine.errors import FieldDoesNotExist, NotUniqueError, DoesNotExist, ValidationError, InvalidQueryError,NotUniqueError

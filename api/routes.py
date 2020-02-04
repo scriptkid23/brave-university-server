@@ -2,6 +2,7 @@ from controllers.employeeController import EmployeesController,EmployeeControlle
 from controllers.homeController import HomeController
 from controllers.authController import *
 from controllers.roleController import *
+from controllers.uploadController import *
 def initialize_routes(api):
     # --------- HomeController --------
 
@@ -18,3 +19,7 @@ def initialize_routes(api):
     # Create Role 
 
     api.add_resource(RoleController,'/api/role')
+
+    # Upload file 
+
+    api.add_resource(UploadImageController,'/api/upload')

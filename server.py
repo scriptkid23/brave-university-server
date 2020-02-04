@@ -10,6 +10,8 @@ import os
 from utils.blacklist import *
 APP_ROOT = os.path.join(os.path.dirname(__file__),'.')
 DOTENV_PATH = os.path.join(APP_ROOT,'.env')
+UPLOAD_FOLDER = os.path.join(APP_ROOT,'upload/image/')
+
 load_dotenv(DOTENV_PATH) 
 
 app  = Flask(__name__)
@@ -31,8 +33,10 @@ app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 app.config['MONGODB_SETTINGS'] = {
     'host': 'mongodb://localhost/braveDB'
 }
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER 
+
 initialize_db(app)
 initialize_routes(api)
 
 HOST = '127.0.0.1'
-app.run(host=HOST,debug=True,port=8000)
+app.run(host=HOST,debug=True,port=5000)
