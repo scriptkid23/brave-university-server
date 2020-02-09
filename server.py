@@ -5,14 +5,14 @@ from api.routes import initialize_routes
 from flask_mongoengine import MongoEngine
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from dotenv import load_dotenv 
-import os 
+from dotenv import load_dotenv
+import os
 from utils.blacklist import *
 APP_ROOT = os.path.join(os.path.dirname(__file__),'.')
 DOTENV_PATH = os.path.join(APP_ROOT,'.env')
 UPLOAD_FOLDER = os.path.join(APP_ROOT,'upload/image/')
 
-load_dotenv(DOTENV_PATH) 
+load_dotenv(DOTENV_PATH)
 
 app  = Flask(__name__)
 
@@ -33,10 +33,10 @@ app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 app.config['MONGODB_SETTINGS'] = {
     'host': 'mongodb://localhost/braveDB'
 }
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER 
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 initialize_db(app)
 initialize_routes(api)
 
-HOST = '127.0.0.1'
+HOST = 'localhost'
 app.run(host=HOST,debug=True,port=5000)
