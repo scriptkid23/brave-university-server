@@ -20,3 +20,8 @@ def exportRank(value):
         return 'D'
     else :
         return 'F'
+def checkNullScore(payload):
+    if payload['tc'] == '' or payload['tk10'] == '' or payload['tk4'] == '' or payload['hk'] == '':
+        return True
+    else:
+        return False

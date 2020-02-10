@@ -14,8 +14,12 @@ class ScoreController(Resource):
     def post(self):
         try:
             payload = request.get_json()
-            createSubjectScore(payload)
-            return Response(json.dumps({'status':200,'message':'create score succeeded'}), mimetype="application/json",status=200)
+            print(payload)
+
+            if createSubjectScore(payload):
+                return Response(json.dumps({'status':200,'message':'create score succeeded'}), mimetype="application/json",status=200)
+            else:
+                return Response(json.dumps({'status':400,'message':'Validation Error'}), mimetype="application/json",status=400)
         except NotUniqueError:
             return Response(json.dumps({'status':400,'message':'subject is exist'}),mimetype="application/json",status=400)
         except ValidationError:
