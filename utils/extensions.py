@@ -1,7 +1,9 @@
 
 # from flask_jwt_extended import decode_token
-
+import collections
 # def checkPermission(token,Model):
+def convertList(data):
+    return loads(dumps(data))
 
 def exportRank(value):
     if value >= 8.5 and value <= 10:
@@ -25,3 +27,68 @@ def checkNullScore(payload):
         return True
     else:
         return False
+
+
+class Rank:
+    data = []
+    timeline = []
+    list_rank_default = []
+
+    result = []
+    def __init__(self,database,timeline,list_rank_default):
+        self.data = database
+        self.timeline = timeline
+        self.list_rank_default = list_rank_default
+
+    def subfExportRank(self,timeline):
+        group_1 = []
+        group_2 = []
+        for i in self.data:
+            if(i['years'] == timeline):
+                if(i['hk'] == 1):
+                    group_1.append(i['tkch'])
+                else:
+                    group_2.append(i['tkch'])
+
+        result = []
+        for j in [group_1, group_2]:
+            counter = collections.Counter(j)
+            temp = {}
+            for i in self.list_rank_default: 
+                try:
+                    temp[i] = dict(counter)[i]
+                except KeyError:
+                    temp[i] = 0
+            result.append(temp)
+        return result
+
+    def exportRank(self):
+        result = []
+        # for i in self.timeline:
+        #     for j in self.subfExportRank(self.timeline):
+        #         result.append(j)
+        # print(result)
+        for i in self.timeline:
+            for j in self.subfExportRank(i):
+               result.append(j)
+        return result 
+    def subfGetValueRank(self,rank):
+        return [i[rank] for i in self.exportRank()]
+    
+    def exportDataRank(self):
+        obj = {}
+        for i in self.list_rank_default:
+            obj[i] = self.subfGetValueRank(i)
+        self.result = obj    
+        return obj
+    def getter(self):
+        return self.result
+
+
+
+def exportTimeLine(data):
+        years = []
+        for i in data:
+            result = i['years']+"."+str(i['hk'])
+            years.append(result)
+        return list(collections.Counter(years).keys())

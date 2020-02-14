@@ -17,15 +17,17 @@ def initialize_routes(api):
     api.add_resource(EmployeesController,'/api/employees')
     api.add_resource(EmployeeController,'/api/employee')
 
-    # Create Role 
+    # Create Role
 
     api.add_resource(RoleController,'/api/role')
 
-    # Upload file 
+    # Upload file
 
     api.add_resource(UploadImageController,'/api/upload')
 
-    # Score 
+    # Score
 
     api.add_resource(ScoreController,'/api/score')
+    api.add_resource(GetListRankController,'/api/rank/list')
     
+    api.add_resource(GetListRankTimeLineController,'/api/rank/time-line')

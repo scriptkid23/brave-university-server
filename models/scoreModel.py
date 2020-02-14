@@ -1,6 +1,9 @@
 from config.configDB import db
 import json
 from utils.extensions import *
+from models.aggregations import *
+from bson.json_util import loads,dumps
+
 
 RANK = ('F','D','D+','C','C+','B','B+','A')
 class Score(db.Document):
@@ -31,9 +34,23 @@ def createSubjectScore(payload):
         return True
     else:
         return False
-def getScoreList():
-    data = Score.objects().to_json()
-    return data
+def getScore():
+
+    score_list = Score.objects._collection.find(
+            {},
+            {
+                "hk" : True,
+                "_id":False,
+                "subject_name" : True,
+                "tc" : True,
+                "tk10" : True,
+                "tk4" : True,
+                "tkch" : True,
+                "years" : True
+
+            })
+    result = loads(dumps(list(score_list)))
+    return json.dumps(result)
 
 def deleteScore(payload):
     subject_code_ =  Score.objects.get(subject_code = payload['subject_code']).delete()
@@ -41,3 +58,89 @@ def deleteScore(payload):
 
 def updateScore(payload):
     result = Score.objects.get(subject_code = payload["subject_code"]).update(**payload["data"])
+
+def getScoreList():
+
+    score_list = Score.objects._collection.find(
+            {},
+            {
+                "hk" : True,
+                "_id":False,
+                "subject_name" : True,
+                "tc" : True,
+                "tk10" : True,
+                "tk4" : True,
+                "tkch" : True,
+                "years" : True
+
+            })
+    result = loads(dumps(list(score_list)))
+    return result
+def getRankList(payload):
+        if(payload['years'] == '' or payload['hk'] == '' or payload['tkch'] == ''):
+            return []
+        else:
+            rank_list = Score.objects._collection.find(
+            {"years":payload['years'],"hk":payload['hk'],'tkch':payload['tkch']},
+            {
+                "_id" : False,
+               "hk" : True,
+               "subject_name" : True,
+               "tkch": True,
+               "tk10": True,
+               "tk4": True,
+               "years" : True,
+               "tc" : True
+            })
+            return json.dumps(loads(dumps(list(rank_list))))
+
+
+def groupRankListFindOne(payload):
+        pipeline = [
+            {'$match': {'years': payload['years'], 'hk': payload['hk']}},
+            {'$group': {'_id': '$tkch', 'total': {'$sum': 1}}}
+        ]
+        rank_groups = Score.objects.aggregate(pipeline)
+        return json.dumps(loads(dumps(rank_groups)))
+
+def groupRankListFindAll():
+        pipeline =  [
+    {
+        '$group': {
+            '_id': '$tkch',
+            'total': {
+                '$sum': 1
+            }
+        }
+    }, {
+        '$sort': {
+            '_id': 1
+        }
+    }
+]
+        rank_groups = Score.objects.aggregate(pipeline)
+        return json.dumps(loads(dumps(rank_groups)))
+
+
+def exportRankTimeLine():
+    RANK_DEFAULT   = ['A','B+','B','C+','C','D+','D','F']
+    TITLE_TIMELINE = exportTimeLine(getScoreList())
+    pipeline = [
+    {
+        '$group': {
+            '_id': '$years'
+        }
+    }, {
+        '$sort': {
+            'years': -1
+        }
+    }
+]
+    TIMELINE = Score.objects.aggregate(pipeline)
+    timeline = [i['_id'] for i in list(TIMELINE)]
+
+    # print(timeline)
+    rank = Rank(list(getScoreList()),sorted(timeline),RANK_DEFAULT)
+
+    result = {"title":TITLE_TIMELINE,"payload":rank.exportDataRank()}
+    return result
