@@ -1,6 +1,9 @@
 
 # from flask_jwt_extended import decode_token
 import collections
+import pandas as pd  
+
+
 # def checkPermission(token,Model):
 def convertList(data):
     return loads(dumps(data))
@@ -89,6 +92,19 @@ class Rank:
 def exportTimeLine(data):
         years = []
         for i in data:
-            result = i['years']+"."+str(i['hk'])
+            result = i['years']+"."+str(int(i['hk']))
             years.append(result)
         return list(collections.Counter(years).keys())
+
+
+def convertExcelFile(file):
+    FIELD = ['tk10','subject_name','tc','subject_code','tk4','tkch','years','hk']
+    data = pd.read_excel(file)
+    if not (sorted(list(data))== sorted(FIELD)):
+        return False
+    else:
+        tmp = data.to_dict(orient="index")
+        result = []
+        for i in tmp:
+            result.append(tmp[i])
+        return result

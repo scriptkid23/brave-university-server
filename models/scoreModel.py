@@ -8,7 +8,7 @@ from bson.json_util import loads,dumps
 RANK = ('F','D','D+','C','C+','B','B+','A')
 class Score(db.Document):
 
-    subject_code = db.StringField(required = True,unique=True, min_length = 1)
+    subject_code = db.IntField(required = True,min_length = 1,unique = True)
     subject_name = db.StringField(required = True,min_length = 1)
     tc           = db.IntField(required = True,min_value = 0)
     tk10         = db.FloatField(max_value=10,min_value=0,required = True)
@@ -20,7 +20,7 @@ class Score(db.Document):
 def createSubjectScore(payload):
     if not checkNullScore(payload):
         newScore = Score(
-            subject_code = payload['subject_code'],
+            subject_code = int(payload['subject_code']),
             subject_name = payload['subject_name'],
             tc           = int(payload['tc']),
             tk10         = float(payload['tk10']),
@@ -144,3 +144,13 @@ def exportRankTimeLine():
 
     result = {"title":TITLE_TIMELINE,"payload":rank.exportDataRank()}
     return result
+
+def uploadScoreFile(file):
+
+    data = convertExcelFile(file)
+    print(data)
+    result = []
+    for i in data:
+        result.append(Score(**i))
+    Score.objects.insert(result)
+    return True

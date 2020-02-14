@@ -4,10 +4,16 @@ from flask_restful import Resource
 from flask_jwt_extended import jwt_required,get_jwt_identity
 from mongoengine.errors import *
 import json
-# Lấy ra tất cả danh sách nhân viên
+
+ALLOWED_EXTENSIONS = set(['xlsx','xls'])
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 class ScoreController(Resource):
     def get(self):
-     
+
         result = getScoreList()
         # print(get_jwt_identity()) // lấy employee_id
         return Response(json.dumps(result), mimetype="application/json", status=200)
@@ -49,3 +55,16 @@ class GetListRankTimeLineController(Resource):
     def get(self):
         payload = exportRankTimeLine()
         return Response(json.dumps(payload),mimetype="application/json", status=200)
+
+class UploadScoreController(Resource):
+    def post(self):
+        try:
+            file = request.files['file']
+            if file and allowed_file(file.filename):
+                result = uploadScoreFile(file)
+                return Response(json.dumps({"code" : 200,"status" :"upload succeeded"}),mimetype="application/json", status=200)
+            else:
+                return Response(json.dumps({"code" : 200,"status" :"upload failed"}), mimetype="application/json", status=400)
+        except BulkWriteError:
+
+            return Response(json.dumps({"code" : 200,"status" :"upload failed"}), mimetype="application/json", status=400)

@@ -28,6 +28,7 @@ def initialize_routes(api):
     # Score
 
     api.add_resource(ScoreController,'/api/score')
+    api.add_resource(UploadScoreController,'/api/score/upload')
+
     api.add_resource(GetListRankController,'/api/rank/list')
-    
     api.add_resource(GetListRankTimeLineController,'/api/rank/time-line')
