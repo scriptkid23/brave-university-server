@@ -18,10 +18,17 @@ from models.roleModel import *
 
 class Member(db.Document):
 
-    member_id       = db.StringField(required=True, unique=True)
-    member_username = db.StringField(max_length=255, min_length = 1,  required=True,unique=True)
-    member_password = db.StringField(max_length=255, min_length = 6,  required=True)
-    member_role     = db.ObjectIdField(required=True,default=ObjectId)
+    member_id         = db.StringField(required=True, unique=True)
+    member_username   = db.StringField(max_length=255, min_length = 1,  required=True,unique=True)
+    member_password   = db.StringField(max_length=255, min_length = 6,  required=True)
+    member_fist_name  = db.StringField(max_length=255, min_length =1)
+    member_last_name  = db.StringField(max_length=255, min_length =1)
+    member_gender     = db.BooleanField()
+    member_email      = db.EmailField()
+    member_address    = db.StringField(max_length=255, min_length =1)
+    member_about_me   = db.StringField(max_length=255, min_length =1)
+    member_avatar     = db.StringField()
+    member_role       = db.StringField(max_length=255, min_length =1)
     # def json(self):
     #     member_dict = {
     #        "member_id": self.member_id,
@@ -41,10 +48,12 @@ class Member(db.Document):
 def register(payload):
         
         newMember= Member(
-            member_id       = encodedID(payload['member_username']),
-            member_username = payload["member_username"],
-            member_password = payload["member_password"],
-            member_role     = ObjectId(getRoleDefault())
+            member_id        = encodedID(payload['member_username']),
+            member_username  = payload["member_username"],
+            member_fist_name = payload["member_fist_name"],
+            member_last_name = payload["member_last_name"],
+            member_password  = payload["member_password"],
+            # member_role      = ObjectId(getRoleDefault())
         )
         newMember.save(validate=True)
 

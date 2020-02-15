@@ -8,6 +8,7 @@ from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
 import os
 from utils.blacklist import *
+
 APP_ROOT = os.path.join(os.path.dirname(__file__),'.')
 DOTENV_PATH = os.path.join(APP_ROOT,'.env')
 UPLOAD_FOLDER = os.path.join(APP_ROOT,'upload/image/')
@@ -26,6 +27,8 @@ jwt  = JWTManager(app)
 def check_if_token_in_blacklist(decrypted_token):
     jti = decrypted_token['jti']
     return jti in blacklist
+
+
 
 app.config['SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 app.config['JWT_BLACKLIST_ENABLED'] = True
