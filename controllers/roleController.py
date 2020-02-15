@@ -1,45 +1,24 @@
 from flask import Response, request
 from models.roleModel import *
 from flask_restful import Resource
-from flask_jwt_extended import jwt_required,get_jwt_identity
+from flask_jwt_extended import (
+    jwt_required, create_access_token,
+    get_jwt_identity, get_jwt_claims
+)
 # from mongoengine.errors import NotUniqueError
 from pymongo.errors import DuplicateKeyError
 import json
 from utils.error import errors 
 # Lấy ra tất cả danh sách nhân viên 
-class RolesController(Resource): 
-    @jwt_required
-    def get(self):
+class RoleController(Resource): 
+   @jwt_required
+   def get(self):
+       ret = {
+        'current_identity': get_jwt_identity(),  # test
+        'current_roles': get_jwt_claims()['roles']  # ['foo', 'bar']
+        }
+       if get_jwt_claims()['roles'] == 'admin':
+            return Response(json.dumps(ret),mimetype="application/json", status=200)
+       else:
+           return Response("",mimetype="application/json", status=404)
 
-        payload = getEmployees()
-        # print(get_jwt_identity()) // lấy employee_id 
-        return Response(payload, mimetype="application/json", status=200)
-
-      
-class RoleController(Resource):
-    # @jwt_required
-    def post(self):
-        payload = request.get_json()
-        createRole(payload)
-        return Response(json.dumps({"code" : 200,"status" :"insert role sucesss"}),mimetype="application/json",status=200)
-       
-    # cập nhật thông tin của một nhân viên 
-    # @jwt_required
-    # def put(self):
-    #     payload = request.get_json()
-    #     updateEmployee(payload)
-    #     return Response(json.dumps({"code" : 200,"status" :"update employee sucesss"}),mimetype="application/json",status=200)
-    
-    # # Xoá một nhân viên 
-    # @jwt_required
-    # def delete(self):
-    #     payload = request.get_json()
-    #     deleteEmployee(payload)
-    #     return Response(json.dumps({"code" : 200,"status" :"delete employee sucesss"}),mimetype="application/json",status=200)
-    
-    # # Lấy ra thông tin chi tiết của một nhân viên 
-    # @jwt_required
-    # def get(self):
-    #     payload = request.get_json()
-    #     result  = getDetailEmployee(payload)
-    #     return Response(result, mimetype="application/json", status=200)

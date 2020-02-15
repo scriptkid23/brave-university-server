@@ -1,7 +1,11 @@
 from flask import Response, request
 from models.memberModel import *
 from flask_restful import Resource
-from flask_jwt_extended import jwt_required,get_raw_jwt
+from flask_jwt_extended import (
+    jwt_required, create_access_token,
+    get_jwt_identity, get_jwt_claims
+)
+
 import json
 from mongoengine.errors import *
 
@@ -14,9 +18,7 @@ class MemberRegisterController(Resource):
         try:
             payload = request.get_json()
             result = register(payload)
-        # if result:
-        #     return Response(json.dumps({"code" : 400,"status" :"Create member failed"}), mimetype="application/json", status=400)
-        # else:
+            
             return Response(
                 json.dumps({"code" : 200,"status" :"Create member sucesss"}), 
                 mimetype="application/json", 
@@ -40,10 +42,10 @@ class MemberLoginController(Resource):
             result = login(payload)
      
             if result:
-                return Response(json.dumps({"code" : 200,"payload" : result}), 
+                return Response(json.dumps({"code" : 200,"token":result['token'],"data":result['data']}), 
                 mimetype="application/json",
                 status=200,
-                headers={"token":result['access_token']})
+                headers={"token":result})
             else:
                 return Response(
                     json.dumps(errors['UnauthorizedError']),

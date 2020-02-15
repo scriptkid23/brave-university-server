@@ -1,45 +1,22 @@
-from flask import Flask
+from app.app import app
+
 from config.configDB import initialize_db
 from flask_restful import Api
 from api.routes import initialize_routes
 from flask_mongoengine import MongoEngine
 from flask_cors import CORS
+from config.config import configuration
 from flask_jwt_extended import JWTManager
-from dotenv import load_dotenv
-import os
-from utils.blacklist import *
+from middleware.security import ConfigurationSecurity
 
-APP_ROOT = os.path.join(os.path.dirname(__file__),'.')
-DOTENV_PATH = os.path.join(APP_ROOT,'.env')
-UPLOAD_FOLDER = os.path.join(APP_ROOT,'upload/image/')
-
-load_dotenv(DOTENV_PATH)
-
-app  = Flask(__name__)
-
+jwt = JWTManager(app)
+configuration(app)
+ConfigurationSecurity(jwt)
 cors = CORS(app)
 api  = Api(app)
-jwt  = JWTManager(app)
-
-
-
-@jwt.token_in_blacklist_loader
-def check_if_token_in_blacklist(decrypted_token):
-    jti = decrypted_token['jti']
-    return jti in blacklist
-
-
-
-app.config['SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
-app.config['JWT_BLACKLIST_ENABLED'] = True
-app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
-app.config['MONGODB_SETTINGS'] = {
-    'host': 'mongodb://localhost/braveDB'
-}
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
 initialize_db(app)
 initialize_routes(api)
+
 
 HOST = 'localhost'
 app.run(host=HOST,debug=True,port=5000)

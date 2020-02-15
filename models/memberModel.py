@@ -1,6 +1,7 @@
 from config.configDB import db
 import datetime
 from flask_jwt_extended import create_access_token,get_raw_jwt, decode_token
+
 from utils.createID import encodedID
 from utils.blacklist import * 
 import json 
@@ -21,21 +22,15 @@ class Member(db.Document):
     member_id         = db.StringField(required=True, unique=True)
     member_username   = db.StringField(max_length=255, min_length = 1,  required=True,unique=True)
     member_password   = db.StringField(max_length=255, min_length = 6,  required=True)
-    member_fist_name  = db.StringField(max_length=255, min_length =1)
+    member_first_name  = db.StringField(max_length=255, min_length =1)
     member_last_name  = db.StringField(max_length=255, min_length =1)
     member_gender     = db.BooleanField()
     member_email      = db.EmailField()
     member_address    = db.StringField(max_length=255, min_length =1)
     member_about_me   = db.StringField(max_length=255, min_length =1)
     member_avatar     = db.StringField()
-    member_role       = db.StringField(max_length=255, min_length =1)
-    # def json(self):
-    #     member_dict = {
-    #        "member_id": self.member_id,
-    #        "member_username": self.member_username,
-    #        "member_password": self.member_password
-    #     }
-    #     return json.dumps(member_dict)
+    member_role       = db.StringField(max_length=255, min_length =1,default="student")
+   
     
     def checkPassword(self,password):
         if(self.member_password == password):
@@ -50,40 +45,30 @@ def register(payload):
         newMember= Member(
             member_id        = encodedID(payload['member_username']),
             member_username  = payload["member_username"],
-            member_fist_name = payload["member_fist_name"],
+            member_first_name = payload["member_first_name"],
             member_last_name = payload["member_last_name"],
-            member_password  = payload["member_password"],
-            # member_role      = ObjectId(getRoleDefault())
+            member_password  = payload["member_password"]
         )
         newMember.save(validate=True)
+class UserObject:
+    def __init__(self, username, roles):
+        self.username = username
+        self.roles = roles
+
 
 def login(payload):
+    print(payload)
     member = Member.objects.get(member_username = payload["member_username"])
     authorized = member.checkPassword(payload["member_password"])
     if not authorized:
         return False
     expires = datetime.timedelta(days = 1)
-    access_token = create_access_token(identity=str(member.member_id),expires_delta=expires)
+    print(member.member_username)
+    user = UserObject(username=member.member_username, roles=member.member_role)
+    access_token = create_access_token(identity=user,expires_delta=expires)
+    
+    return {"token":access_token,"data":{"username" :member.member_username,"Role":member.member_role}}
 
-    pipeline = [{
-        "$lookup" : {
-            "from" : Role._get_collection_name(),
-            "localField" : 'member_role',
-            "foreignField" : '_id',
-            "as" : 'my_role'
-        }
-    }]
-
-    permission_list = Member.objects(member_id = member['member_id']).aggregate(pipeline)
-    result = loads(dumps(list(permission_list)))
-    del result[0]['my_role'][0]['_id']
-
-    payload = {
-        "access_token" : access_token,
-        "permission" : result[0]['my_role'][0]
-    }
-    # print(decode_token('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1ODA3NDAxNzgsIm5iZiI6MTU4MDc0MDE3OCwianRpIjoiYTQ1NDVkMzQtMGNjMS00YWZiLWFiYzgtMjAxODY3ZmM5ZTk2IiwiZXhwIjoxNTgwODI2NTc4LCJpZGVudGl0eSI6Ik1qQXlNQzB5TFRNdE1USXRORFV0TVRndE5EYzFNemt3TFdGa2JXbHUiLCJmcmVzaCI6ZmFsc2UsInR5cGUiOiJhY2Nlc3MifQ.9l1HtvKDXChn0aKS4H17Fw7znVwvyU5_d4C8NXVyQTM'))
-    return payload
 
 def logout():
     jti = get_raw_jwt()['jti']

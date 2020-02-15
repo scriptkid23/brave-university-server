@@ -1,7 +1,7 @@
 from flask import Response, request
 from models.scoreModel import *
 from flask_restful import Resource
-from flask_jwt_extended import jwt_required,get_jwt_identity
+from flask_jwt_extended import jwt_required,get_jwt_identity,get_jwt_claims
 from mongoengine.errors import *
 import json
 
@@ -12,11 +12,13 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 class ScoreController(Resource):
+    @jwt_required
     def get(self):
 
         result = getScoreList()
         # print(get_jwt_identity()) // lấy employee_id
         return Response(json.dumps(result), mimetype="application/json", status=200)
+    @jwt_required
     def post(self):
         try:
             payload = request.get_json()
@@ -30,6 +32,7 @@ class ScoreController(Resource):
             return Response(json.dumps({'status':400,'message':'subject is exist'}),mimetype="application/json",status=400)
         except ValidationError:
             return Response(json.dumps({'status':400,'message':'Validation Error'}),mimetype="application/json",status=400)
+    @jwt_required
     def delete(self):
         try:
             payload = request.get_json()
@@ -37,6 +40,7 @@ class ScoreController(Resource):
             return Response(json.dumps({'status':200,'message':'delete score succeeded'}), mimetype="application/json",status=200)
         except DoesNotExist:
             return Response(json.dumps({'status':400,'message':'delete score failed, Score Does Not Exist'}), mimetype="application/json",status=400)
+    @jwt_required
     def put(self):
         try:
             payload = request.get_json()
@@ -48,15 +52,18 @@ class ScoreController(Resource):
 
 
 class GetListRankController(Resource):
+    @jwt_required
     def get(self):
         result = groupRankListFindAll()
         return Response(result, mimetype="application/json", status=200)
 class GetListRankTimeLineController(Resource):
+    @jwt_required
     def get(self):
         payload = exportRankTimeLine()
         return Response(json.dumps(payload),mimetype="application/json", status=200)
 
 class UploadScoreController(Resource):
+    @jwt_required
     def post(self):
         try:
             file = request.files['file']

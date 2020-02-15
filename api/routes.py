@@ -17,7 +17,7 @@ def initialize_routes(api):
     api.add_resource(EmployeesController,'/api/employees')
     api.add_resource(EmployeeController,'/api/employee')
 
-    # Create Role
+    # Get Role
 
     api.add_resource(RoleController,'/api/role')
 
