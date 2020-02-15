@@ -3,7 +3,7 @@ import json
 from utils.extensions import *
 from models.aggregations import *
 from bson.json_util import loads,dumps
-
+from flask_jwt_extended import get_jwt_claims
 
 RANK = ('F','D','D+','C','C+','B','B+','A')
 class Score(db.Document):
@@ -16,7 +16,7 @@ class Score(db.Document):
     tk4          = db.FloatField(max_value=4,min_value=0,required = True)
     hk           = db.IntField(required = True,choices = (1,2))
     years        = db.StringField(required = True, min_length = 1)
-
+    score_of     = db.StringField(required = True)
 def createSubjectScore(payload):
     if not checkNullScore(payload):
         newScore = Score(
@@ -27,8 +27,8 @@ def createSubjectScore(payload):
             tkch         = exportRank(float(payload['tk10'])),
             tk4          = float(payload['tk4']),
             hk           = int(payload['hk']),
-            years        = payload['years']
-
+            years        = payload['years'],
+            score_of     = payload['score_of']
         )
         newScore.save()
         return True
@@ -59,10 +59,10 @@ def deleteScore(payload):
 def updateScore(payload):
     result = Score.objects.get(subject_code = payload["subject_code"]).update(**payload["data"])
 
-def getScoreList():
+def getScoreList(score_of):
 
     score_list = Score.objects._collection.find(
-            {},
+            {"score_of":score_of},
             {
                 "hk" : True,
                 "_id":False,
@@ -103,8 +103,13 @@ def groupRankListFindOne(payload):
         rank_groups = Score.objects.aggregate(pipeline)
         return json.dumps(loads(dumps(rank_groups)))
 
-def groupRankListFindAll():
+def groupRankListFindAll(score_of):
         pipeline =  [
+            {
+            '$match': {
+                'score_of': score_of
+            }
+            },
     {
         '$group': {
             '_id': '$tkch',
@@ -117,15 +122,22 @@ def groupRankListFindAll():
             '_id': 1
         }
     }
+
 ]
         rank_groups = Score.objects.aggregate(pipeline)
         return json.dumps(loads(dumps(rank_groups)))
 
 
-def exportRankTimeLine():
+def exportRankTimeLine(score_of):
     RANK_DEFAULT   = ['A','B+','B','C+','C','D+','D','F']
-    TITLE_TIMELINE = exportTimeLine(getScoreList())
+    print(type(score_of))
+    TITLE_TIMELINE = exportTimeLine(getScoreList(score_of))
     pipeline = [
+        {
+            '$match': {
+                'score_of': score_of
+            }
+        },
     {
         '$group': {
             '_id': '$years'
@@ -134,13 +146,13 @@ def exportRankTimeLine():
         '$sort': {
             'years': -1
         }
-    }
+    },
 ]
     TIMELINE = Score.objects.aggregate(pipeline)
     timeline = [i['_id'] for i in list(TIMELINE)]
 
     # print(timeline)
-    rank = Rank(list(getScoreList()),sorted(timeline),RANK_DEFAULT)
+    rank = Rank(list(getScoreList(score_of)),sorted(timeline),RANK_DEFAULT)
 
     result = {"title":TITLE_TIMELINE,"payload":rank.exportDataRank()}
     return result

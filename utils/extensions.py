@@ -98,7 +98,7 @@ def exportTimeLine(data):
 
 
 def convertExcelFile(file):
-    FIELD = ['tk10','subject_name','tc','subject_code','tk4','tkch','years','hk']
+    FIELD = ['tk10','subject_name','tc','subject_code','tk4','tkch','years','hk','score_of']
     data = pd.read_excel(file)
     if not (sorted(list(data))== sorted(FIELD)):
         return False

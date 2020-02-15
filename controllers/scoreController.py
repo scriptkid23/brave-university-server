@@ -14,16 +14,17 @@ def allowed_file(filename):
 class ScoreController(Resource):
     @jwt_required
     def get(self):
-
-        result = getScoreList()
+        score_of = get_jwt_identity()
+        result = getScoreList(score_of)
         # print(get_jwt_identity()) // lấy employee_id
         return Response(json.dumps(result), mimetype="application/json", status=200)
+
     @jwt_required
     def post(self):
         try:
             payload = request.get_json()
             print(payload)
-
+            payload['score_of'] = get_jwt_identity()
             if createSubjectScore(payload):
                 return Response(json.dumps({'status':200,'message':'create score succeeded'}), mimetype="application/json",status=200)
             else:
@@ -32,6 +33,7 @@ class ScoreController(Resource):
             return Response(json.dumps({'status':400,'message':'subject is exist'}),mimetype="application/json",status=400)
         except ValidationError:
             return Response(json.dumps({'status':400,'message':'Validation Error'}),mimetype="application/json",status=400)
+    
     @jwt_required
     def delete(self):
         try:
@@ -54,12 +56,14 @@ class ScoreController(Resource):
 class GetListRankController(Resource):
     @jwt_required
     def get(self):
-        result = groupRankListFindAll()
+        score_of = get_jwt_identity()
+        result = groupRankListFindAll(score_of)
         return Response(result, mimetype="application/json", status=200)
 class GetListRankTimeLineController(Resource):
     @jwt_required
     def get(self):
-        payload = exportRankTimeLine()
+        score_of = get_jwt_identity()
+        payload = exportRankTimeLine(score_of)
         return Response(json.dumps(payload),mimetype="application/json", status=200)
 
 class UploadScoreController(Resource):
