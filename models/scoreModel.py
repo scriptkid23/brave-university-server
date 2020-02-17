@@ -17,6 +17,7 @@ class Score(db.Document):
     hk           = db.IntField(required = True,choices = (1,2))
     years        = db.StringField(required = True, min_length = 1)
     score_of     = db.StringField(required = True)
+    
 def createSubjectScore(payload):
     if not checkNullScore(payload):
         newScore = Score(

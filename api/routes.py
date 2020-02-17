@@ -13,7 +13,9 @@ def initialize_routes(api):
     api.add_resource(MemberLoginController,'/api/auth/login')
     api.add_resource(MemberLogoutController,'/api/auth/logout')
 
+    # Get Member detail
 
+    api.add_resource(MemberGetDetailController,'/api/member/detail')
     api.add_resource(EmployeesController,'/api/employees')
     api.add_resource(EmployeeController,'/api/employee')
 

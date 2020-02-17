@@ -108,3 +108,24 @@ def convertExcelFile(file):
         for i in tmp:
             result.append(tmp[i])
         return result
+
+def ExportMessage(data,obj):
+    if(len(data) == 0):
+        data.append({
+            "own" : obj['own'],
+            "avatar" : obj['avatar'],
+            "message" : [obj['message']]
+        })
+        return data
+    if(data[len(data) - 1]['own'] == obj['own']):
+        data[len(data) - 1]['message'].append(
+            obj['message']
+        )
+        return data
+    else:
+        data.append({
+            "own": obj['own'],
+            "avatar": obj['avatar'],
+            "message": [obj['message']]
+        })
+        return data

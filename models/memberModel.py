@@ -3,16 +3,16 @@ import datetime
 from flask_jwt_extended import create_access_token,get_raw_jwt, decode_token
 
 from utils.createID import encodedID
-from utils.blacklist import * 
-import json 
+from utils.blacklist import *
+import json
 from bson.objectid import ObjectId
 from bson.json_util import loads,dumps
-# from utils.constant import * 
+# from utils.constant import *
 
 from models.roleModel import *
 # from mongoengine.errors import FieldDoesNotExist, NotUniqueError, DoesNotExist, ValidationError, InvalidQueryError,NotUniqueError
 
-# # Initialize Validation 
+# # Initialize Validation
 # def checkFieldUsername(self):
 #         if(len(self.member_username) == 0):
 #             raise ValidationError('Username Field not null ')
@@ -28,20 +28,20 @@ class Member(db.Document):
     member_email      = db.EmailField()
     member_address    = db.StringField(max_length=255, min_length =1)
     member_about_me   = db.StringField(max_length=255, min_length =1)
-    member_avatar     = db.StringField()
+    member_avatar     = db.StringField(default="")
     member_role       = db.StringField(max_length=255, min_length =1,default="student")
-   
-    
+
+
     def checkPassword(self,password):
         if(self.member_password == password):
             return True
         else:
             return False
-    
+
 
 
 def register(payload):
-        
+
         newMember= Member(
             member_id        = encodedID(payload['member_username']),
             member_username  = payload["member_username"],
@@ -66,16 +66,29 @@ def login(payload):
     print(member.member_username)
     user = UserObject(username=member.member_username, roles=member.member_role)
     access_token = create_access_token(identity=user,expires_delta=expires)
-    
+
     return {"token":access_token,"data":{"username" :member.member_username,"Role":member.member_role}}
 
 
+def getMemberDetail(payload):
+    member_detail = Member.objects._collection.find(
+            {"member_username":payload['member_username']},
+            {
+                "member_username" : True,
+                "_id":False,
+                "member_first_name" : True,
+                "member_last_name" : True,
+                "member_role" : True,
+                "member_avatar" : True,
+            })
+    result = loads(dumps(list(member_detail)))
+    return result
 def logout():
     jti = get_raw_jwt()['jti']
     blacklist.add(jti)
 
 # def login(payload):
-    
+
 # def signout(payload):
 # def getEmployees():
 #     return Employee.objects().to_json()

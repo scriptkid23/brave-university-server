@@ -18,15 +18,15 @@ class MemberRegisterController(Resource):
         try:
             payload = request.get_json()
             result = register(payload)
-            
+
             return Response(
-                json.dumps({"code" : 200,"status" :"Create member sucesss"}), 
-                mimetype="application/json", 
+                json.dumps({"code" : 200,"status" :"Create member sucesss"}),
+                mimetype="application/json",
                 status=200)
         except(NotUniqueError):
             return Response(
-                json.dumps(errors['MemberAlreadyExistsError']), 
-                mimetype="application/json", 
+                json.dumps(errors['MemberAlreadyExistsError']),
+                mimetype="application/json",
                 status=errors['MemberAlreadyExistsError']['status'])
         except(ValidationError):
             return Response(
@@ -37,12 +37,12 @@ class MemberRegisterController(Resource):
 
 class MemberLoginController(Resource):
     def post(self):
-        try: 
+        try:
             payload = request.get_json()
             result = login(payload)
-     
+
             if result:
-                return Response(json.dumps({"code" : 200,"token":result['token'],"data":result['data']}), 
+                return Response(json.dumps({"code" : 200,"token":result['token'],"data":result['data']}),
                 mimetype="application/json",
                 status=200,
                 headers={"token":result})
@@ -58,13 +58,30 @@ class MemberLoginController(Resource):
                 mimetype="application/json",
                 status=errors['MemberNotExistsError']['status']
             )
-        
+
+class MemberGetDetailController(Resource):
+    @jwt_required
+    def post(self):
+        payload = request.get_json()
+        if not payload['member_username'] != get_jwt_identity():
+            result = getMemberDetail(payload)
+            return Response(
+                json.dumps({"code" :200,"payload" :result}),
+                mimetype="application/json",
+                status=200)
+        else:
+
+            return Response(
+                json.dumps({"code" :401,"message" :"request failed"}),
+                mimetype="application/json",
+                status=401)
+
 class MemberLogoutController(Resource):
     @jwt_required
     def delete(self):
         logout()
         return Response(
-            json.dumps({"code" :200,"status" :"logout success"}), 
+            json.dumps({"code" :200,"status" :"logout success"}),
             mimetype="application/json",
             status=200)
 
