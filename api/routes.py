@@ -4,6 +4,8 @@ from controllers.authController import *
 from controllers.roleController import *
 from controllers.uploadController import *
 from controllers.scoreController import *
+from controllers.chatController import *
+
 def initialize_routes(api):
     # --------- HomeController --------
 
