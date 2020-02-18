@@ -34,3 +34,7 @@ def initialize_routes(api):
 
     api.add_resource(GetListRankController,'/api/rank/list')
     api.add_resource(GetListRankTimeLineController,'/api/rank/time-line')
+
+
+    # Chat 
+    api.add_resource(ChatController,'/api/chat')
