@@ -1,22 +1,30 @@
 from flask_socketio import SocketIO,emit
 import json
 from utils.extensions import ExportMessage
+from flask_jwt_extended import jwt_required,get_jwt_claims,get_jwt_identity
 socketio = SocketIO(cors_allowed_origins='*')
 
 def initialize_socketio(app):
     socketio.init_app(app)
 
+
 @socketio.on('connect')
+
 def on_connect():
     print('user connected')
 
-    
+
+   
+ 
 @socketio.on('disconnect')
+
 def on_disconnect():
     print('user disconnected')
 
 chat_store = []
+
 @socketio.on('my_event')
+
 def my_event(data):
     ExportMessage(chat_store,data)
     print(chat_store)
