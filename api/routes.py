@@ -5,11 +5,11 @@ from controllers.roleController import *
 from controllers.uploadController import *
 from controllers.scoreController import *
 from controllers.chatController import *
-
+from controllers.bookingRoomController import *
 def initialize_routes(api):
     # --------- HomeController --------
 
-    api.add_resource(HomeController,'/')
+    # api.add_resource(HomeController,'/')
 
     api.add_resource(MemberRegisterController,'/api/auth/register')
     api.add_resource(MemberLoginController,'/api/auth/login')
@@ -20,6 +20,7 @@ def initialize_routes(api):
     api.add_resource(MemberGetDetailController,'/api/member/detail')
     api.add_resource(EmployeesController,'/api/employees')
     api.add_resource(EmployeeController,'/api/employee')
+    api.add_resource(MemberUpdateProfile,'/api/member/update')
 
     # Get Role
 
@@ -40,3 +41,6 @@ def initialize_routes(api):
 
     # Chat 
     api.add_resource(ChatController,'/api/chat')
+
+    # Booking 
+    api.add_resource(BookingRoomController,'/api/booking')

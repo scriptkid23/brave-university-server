@@ -14,7 +14,9 @@ app.config['SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 app.config['MONGODB_SETTINGS'] = {
-    'host': 'mongodb+srv://braveDB:whoami@cluster0-4jdjf.mongodb.net/braveDB?retryWrites=true&w=majority'
+    'db' : 'braveDB',
+    'host': 'localhost',
+    'port': 27017
     
     }
 

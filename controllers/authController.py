@@ -75,6 +75,23 @@ class MemberGetDetailController(Resource):
                 json.dumps({"code" :401,"message" :"request failed"}),
                 mimetype="application/json",
                 status=401)
+class MemberUpdateProfile(Resource):
+    @jwt_required
+    def put(self):
+
+        payload = request.get_json()
+        if not payload['member_username'] != get_jwt_identity():
+            result = updateMemberProfile(payload)
+            return Response(
+                json.dumps({"code" :200,"payload" :result}),
+                mimetype="application/json",
+                status=200)
+        else:
+            return Response(
+                json.dumps({"code" :401,"message" :"request failed"}),
+                mimetype="application/json",
+                status=401)
+
 
 class MemberLogoutController(Resource):
     @jwt_required
@@ -84,6 +101,7 @@ class MemberLogoutController(Resource):
             json.dumps({"code" :200,"status" :"logout success"}),
             mimetype="application/json",
             status=200)
+
 
 
 # class EmployeeController(Resource):

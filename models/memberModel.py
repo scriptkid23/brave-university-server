@@ -24,10 +24,10 @@ class Member(db.Document):
     member_password   = db.StringField(max_length=255, min_length = 6,  required=True)
     member_first_name  = db.StringField(max_length=255, min_length =1)
     member_last_name  = db.StringField(max_length=255, min_length =1)
-    member_gender     = db.BooleanField()
-    member_email      = db.EmailField()
-    member_address    = db.StringField(max_length=255, min_length =1)
-    member_about_me   = db.StringField(max_length=255, min_length =1)
+    member_gender     = db.BooleanField(default=True)
+    member_email      = db.StringField(default="")
+    member_address    = db.StringField(max_length=255,default="")
+    member_about_me   = db.StringField(max_length=255,default="")
     member_avatar     = db.StringField(default="")
     member_role       = db.StringField(max_length=255, min_length =1,default="student")
 
@@ -73,16 +73,16 @@ def login(payload):
 def getMemberDetail(payload):
     member_detail = Member.objects._collection.find(
             {"member_username":payload['member_username']},
-            {
-                "member_username" : True,
-                "_id":False,
-                "member_first_name" : True,
-                "member_last_name" : True,
-                "member_role" : True,
-                "member_avatar" : True,
+            {     
+                "_id":False
             })
     result = loads(dumps(list(member_detail)))
     return result
+
+def updateMemberProfile(payload):
+    result = Member.objects.get(member_username = payload["member_username"]).update(**payload["data"])
+    return result
+    
 def logout():
     jti = get_raw_jwt()['jti']
     blacklist.add(jti)

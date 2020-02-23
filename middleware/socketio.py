@@ -13,18 +13,13 @@ def initialize_socketio(app):
 def on_connect():
     print('user connected')
 
-
-   
- 
 @socketio.on('disconnect')
-
 def on_disconnect():
     print('user disconnected')
 
 chat_store = []
 
 @socketio.on('my_event')
-
 def my_event(data):
     ExportMessage(chat_store,data)
     print(chat_store)
