@@ -20,7 +20,7 @@ class MemberRegisterController(Resource):
             result = register(payload)
 
             return Response(
-                json.dumps({"code" : 200,"status" :"Create member sucesss"}),
+                json.dumps({"status" : 200,"message" :"Create member sucesss"}),
                 mimetype="application/json",
                 status=200)
         except(NotUniqueError):

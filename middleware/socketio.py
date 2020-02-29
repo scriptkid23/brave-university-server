@@ -8,15 +8,6 @@ def initialize_socketio(app):
     socketio.init_app(app)
 
 
-@socketio.on('connect')
-
-def on_connect():
-    print('user connected')
-
-@socketio.on('disconnect')
-def on_disconnect():
-    print('user disconnected')
-
 chat_store = []
 
 @socketio.on('my_event')
