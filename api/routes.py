@@ -43,4 +43,6 @@ def initialize_routes(api):
     api.add_resource(ChatController,'/api/chat')
 
     # Booking 
-    api.add_resource(BookingRoomController,'/api/booking')
+    api.add_resource(BookingRoomController,'/api/booking/create')
+    api.add_resource(GetListBookingRoomController,'/api/booking/get')
+    api.add_resource(UpdateBookingRoomController,'/api/booking/update')

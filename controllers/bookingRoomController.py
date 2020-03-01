@@ -14,9 +14,52 @@ from utils.error import errors
 
 class BookingRoomController(Resource):
     def post(self):
-        payload = request.get_json()
-        create(payload)
-        return Response(
-                json.dumps({"code" : 200,"status" :"Create booking sucesss"}),
+        try:
+            payload = request.get_json()
+            print("Payload : ", payload)
+            create(payload)
+            return Response(
+                json.dumps(
+                    {"status": 200, "message": "Create booking sucesss"}),
                 mimetype="application/json",
                 status=200)
+        except ValidationError:
+            return Response(
+                json.dumps({"status": 400, "message": "Validation Error"}),
+                mimetype="application/json",
+                status=400)
+
+    
+
+class GetListBookingRoomController(Resource):
+    def post(self):
+        try:   
+            payload = request.get_json()
+            data = getListBookingRoom(payload)
+            return Response(
+                json.dumps(
+                    {"status": 200, "payload": data}),
+                mimetype="application/json",
+                status=200)
+        except ValidationError:
+            return Response(
+                json.dumps({"status": 400, "message": "Validation Error"}),
+                mimetype="application/json",
+                status=400)
+
+class UpdateBookingRoomController(Resource):
+    def put(self):
+        try:
+            payload = request.get_json()
+            print("payload:",payload)
+            result = update(payload)
+            return Response(
+                json.dumps(
+                    {"status": 200, "message": "Update booking sucesss"}),
+                mimetype="application/json",
+                status=200)
+        except ValidationError:
+            return Response(
+                json.dumps({"status": 400, "message": "Validation Error"}),
+                mimetype="application/json",
+                status=400)
