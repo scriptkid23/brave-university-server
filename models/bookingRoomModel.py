@@ -1,7 +1,7 @@
 from config.configDB import db
 import datetime
 from flask_jwt_extended import create_access_token, get_raw_jwt, decode_token
-
+from utils.error import LimitedError
 from utils.createID import encodedID
 from utils.blacklist import *
 import json
@@ -33,35 +33,57 @@ class BookingRoom(db.Document):
     booking_start_shift = db.IntField(required=True, choices=SHIFT)
     booking_end_shift = db.IntField(required=True)
     booking_note = db.StringField()
-    booking_status = db.StringField(
-        required=True, choices=STATUS, default="Pending")
+    booking_status = db.StringField(required=True, choices=STATUS, default="Pending")
     booking_room_name = db.StringField(required=True, min_length = 1, default= "None")
-    def Validation(self):
-        if(self.booking_start_shift >= self.booking_end_shift):
-            return true
     booking_is_submit = db.IntField(required=True, default= 0)
+    booking_by_member  = db.StringField(required=True)
+    booking_by_member_role    = db.StringField(required=True)
+    booking_current_date = db.StringField(required= True)
 
+def counterBooking(payload):
+    pipeline = [
+        {
+            '$match': {
+                'booking_by_member': payload['booking_by_member'], 
+                'booking_current_date': payload['booking_current_date']
+            }
+        }, {
+            '$group': {
+                '_id': '$booking_by_member', 
+                'count': {
+                    '$sum': 1
+                }
+            }
+        }
+    ]
+    result = list(BookingRoom.objects.aggregate(pipeline))
+    if(len(result) == 0):
+        return 0
+    else:
+        return list(BookingRoom.objects.aggregate(pipeline))[0]["count"]
 
 def create(payload):
-
-    newBooking = BookingRoom(
-
-        booking_by=payload['booking_by'],
-        booking_student_code=payload['booking_student_code'],
-        booking_class_wildcard=payload['booking_class_wildcard'],
-        booking_student_number=payload['booking_student_number'],
-        booking_purpose=payload['booking_purpose'],
-        booking_lecturer=payload['booking_lecturer'],
-        booking_using_time=payload['booking_using_time'],
-        booking_start_shift=payload['booking_start_shift'],
-        booking_end_shift=payload['booking_end_shift'],
-        booking_note=payload['booking_note'],
-        
-       
-    )
+    count = counterBooking(payload)
     
-    newBooking.save(validate=True)
-   
+    if(payload["booking_by_member_role"] == "student" and count < 1):
+        newBooking = BookingRoom(
+            booking_by=payload['booking_by'],
+            booking_student_code=payload['booking_student_code'],
+            booking_class_wildcard=payload['booking_class_wildcard'],
+            booking_student_number=payload['booking_student_number'],
+            booking_purpose=payload['booking_purpose'],
+            booking_lecturer=payload['booking_lecturer'],
+            booking_using_time=payload['booking_using_time'],
+            booking_start_shift=payload['booking_start_shift'],
+            booking_end_shift=payload['booking_end_shift'],
+            booking_note=payload['booking_note'],
+            booking_by_member = payload['booking_by_member'],
+            booking_by_member_role = payload['booking_by_member_role'],
+            booking_current_date = payload['booking_current_date']
+        )
+        newBooking.save(validate=True)
+    else:
+        raise LimitedError
 
 def getListBookingRoom(payload):
     if payload['booking_id'] == "":

@@ -4,6 +4,7 @@ from utils.createID import encodedID
 import json 
 
 # Định nghĩa đối tượng collection trong MongoDB 
+# Collection Object defined in MongoDB
 class Employee(db.Document):
     employee_id = db.StringField(required=True, unique=True)
     employee_name = db.StringField(max_length=255, required=True)

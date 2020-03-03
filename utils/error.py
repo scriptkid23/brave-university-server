@@ -19,6 +19,10 @@
 # class EmailAlreadyExistsError(Exception):
 #     pass
 
+class LimitedError(Exception):
+    pass
+
+
 
 errors = {
     "InternalServerError": {

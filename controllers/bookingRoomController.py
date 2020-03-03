@@ -5,18 +5,21 @@ from flask_jwt_extended import (
     jwt_required, create_access_token,
     get_jwt_identity, get_jwt_claims
 )
-
+from datetime import date
 import json
 from mongoengine.errors import *
 
-from utils.error import errors
+from utils.error import *
 
 
 class BookingRoomController(Resource):
+    @jwt_required
     def post(self):
         try:
             payload = request.get_json()
-            print("Payload : ", payload)
+            payload["booking_by_member"] = get_jwt_identity()
+            payload["booking_by_member_role"] = get_jwt_claims()["roles"]
+            payload["booking_current_date"] = date.today().strftime("%d-%m-%Y")
             create(payload)
             return Response(
                 json.dumps(
@@ -28,7 +31,11 @@ class BookingRoomController(Resource):
                 json.dumps({"status": 400, "message": "Validation Error"}),
                 mimetype="application/json",
                 status=400)
-
+        except LimitedError:
+            return Response(
+                json.dumps({"status": 400, "message": "Booking Limited"}),
+                mimetype="application/json",
+                status=400)
     
 
 class GetListBookingRoomController(Resource):
