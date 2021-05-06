@@ -8,7 +8,7 @@ Click==7.0
 constants==0.1.0
 Flask==1.1.1
 Flask-Bcrypt==0.7.1
-Flask-Cors==3.0.8
+Flask-Cors==3.0.9
 Flask-JWT-Extended==3.24.1
 Flask-Migrate==2.5.2
 flask-mongoengine==0.9.5
