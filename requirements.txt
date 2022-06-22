@@ -27,7 +27,7 @@ Mako==1.1.0
 MarkupSafe==1.1.1
 mongoengine==0.19.1
 more-itertools==8.1.0
-numpy==1.18.1
+numpy==1.22.0
 pandas==1.0.1
 pycparser==2.19
 PyJWT==1.7.1
